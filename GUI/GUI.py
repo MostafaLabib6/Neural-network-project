@@ -65,7 +65,7 @@ class GUI:
         if self.selected_feature1.get() and self.selected_class1.get() and self.selected_class2.get() and self.selected_feature2.get():
             self.controller.classFillter(class1=self.selected_class1.get(),class2=self.selected_class2.get())
             self.controller.FeatureFillter(feat1=self.selected_feature1.get(),feat2=self.selected_feature2.get())
-            self.controller.train(learning_rate=self.getLearningRate(),bais=self.getBais(),epochs=self.getEpochs())
+            self.controller.train(learning_rate=float(self.getLearningRate()),bais=self.getBais(),epochs=int(self.getEpochs()))
     def test(self):
         if self.selected_feature1.get() and self.selected_class1.get() and self.selected_class2.get() and self.selected_feature2.get():
             self.controller.classFillter(class1=self.selected_class1.get(),class2=self.selected_class2.get())

@@ -36,8 +36,9 @@ class DataPreProcessingService:
    return data
     
  def FeatureFillter(self, feat1:str,feat2:str,data):
-      data=data[[str(feat1),str(feat2)]]
-      data = data.apply(np.random.permutation, axis=1)
+      data=data[[str(feat1),str(feat2),"species"]]
+      data = data.apply(np.random.permutation, axis=0)
+      print(data)
       return data   
 # instance method
  def SharedPreProcessing(self):
