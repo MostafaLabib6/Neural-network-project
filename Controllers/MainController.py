@@ -53,7 +53,7 @@ class MainController:
         plt.ylabel('Actual', fontsize=18)
         plt.title('Confusion Matrix', fontsize=18)
         fig.show()
-
+#
         return acc
 
     def showGraphs(self):
