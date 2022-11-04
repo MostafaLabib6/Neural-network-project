@@ -132,8 +132,8 @@ def model(X_train, Y_train, X_test, Y_test, num_iterations=2000,
     """
     w, b = initializePramaters(X_train.shape[1])
     w, b, costs = optimize(w, b, X_train, Y_train, num_iterations, learning_rate, print_cost, withBias)
-    YpredTrain = predict(X_train, w, b, Y_train)
-    YpredTest = predict(X_test, w, b, Y_test)
+    YpredTrain,_ = predict(X_train, w, b, Y_train)
+    YpredTest, _ = predict(X_test, w, b, Y_test)
     print("Train accuracy :", YpredTrain)
     print("Test accuracy :", YpredTest)
 
@@ -155,7 +155,6 @@ def get_confusion_matrix(predicted, actual):
     tp, fp, tn, fn = (0, 0, 0, 0)
     predicted = predicted.to_numpy()
     # actual = actual.to_numpy()
-    print(predicted)
     for i in range(len(predicted)):
         if predicted[i] == 1:
             if predicted[i] == actual[i]:
@@ -203,8 +202,6 @@ def predict(X, w, b, actual):
             --> model accuracy :)
     """
     acc = 0
-    print(X.shape)
-    print(w.shape)
     predicted = X @ w + b
     predicted = pd.DataFrame(predicted)
     predicted = predicted[0].apply(signum)
