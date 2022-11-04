@@ -1,9 +1,7 @@
 import tkinter as tk
-from tkinter import messagebox as ms
 from tkinter import ttk
 from tkinter import *
-from GUI.Controllers.MainController import MainController
-from click import command
+from Controllers.MainController import MainController
 
 
 class GUI:
@@ -53,11 +51,7 @@ class GUI:
             self.controller.FeatureFillter(feat1=self.selected_feature1.get(), feat2=self.selected_feature2.get())
             self.controller.trainModel(learning_rate=float(self.getLearningRate()), bais=self.getBais(),
                                        epochs=int(self.getEpochs()))
-            acc = self.controller.testModel()
-
-    def test(self):
-        acc = self.controller.testModel()
-        # ms.showinfo(title="Accuracy", message=f"The Accuracy of model on classes {self.selected_class1.get()} and {self.selected_class2.get()} with respect to features {self.selected_feature1.get()} and {self.selected_feature2.get()} is {acc}%")
+            self.controller.testModel()
 
     def showplots(self):
         self.controller.showGraphs()
@@ -74,6 +68,7 @@ class GUI:
 
         # This is the section of code which creates the main window
         self.root.geometry('620x380')
+        self.root.resizable(width=0, height=0)
         self.root.configure(background='#F0F8FF')
         self.root.title('Signum :)')
 
@@ -141,18 +136,10 @@ class GUI:
         # This is the section of code which creates the a label
         Label(self.root, text='Select Class 2', bg='#F0F8FF', font=('arial', 12, 'normal')).place(x=320, y=100)
 
-        # This is the section of code which creates the a label
-        # Label(root, text='this is a label5', bg='#F0F8FF', font=('arial', 12, 'normal')).place(x=353, y=206)
-
-        # This is the section of code which creates a button
-        # command=btnClickFunction
-        Button(self.root, text='train', bg='#F0F8FF', font=('arial', 12, 'normal'), width=14, command=self.train).place(
+        Button(self.root, text='RUN', bg='#F0F8FF', font=('arial', 12, 'normal'), width=14, command=self.train).place(
             x=450, y=330)
 
-        # This is the section of code which creates a button
-        #  command=btnClickFunction
-        # Button(self.root, text='test', bg='#F0F8FF', font=('arial', 12, 'normal'), width=10,command=self.test).place(x=480, y=364)
-        Button(self.root, text='graphs', bg='#F0F8FF', font=('arial', 12, 'normal'), width=14,
+        Button(self.root, text='Drawing', bg='#F0F8FF', font=('arial', 12, 'normal'), width=14,
                command=self.showplots).place(x=280, y=330)
 
         self.root.mainloop()

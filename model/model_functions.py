@@ -71,7 +71,7 @@ def backwordProb(X, cost, withBias=False):
     """
 
     dw = X * cost
-    db=0
+    db = 0
     if withBias == True:
         db = cost
 
@@ -117,7 +117,7 @@ def optimize(w, b, X, Y, numIter, learning_rate, print_cost=False, withBias=Fals
 
 
 def model(X_train, Y_train, X_test, Y_test, num_iterations=2000,
-          learning_rate=0.01, print_cost=False, withBias = False):
+          learning_rate=0.01, print_cost=False, withBias=False):
     """
     :param X_train: input vector of size (2,m)
     :param Y_train: Training Actual value Vector
@@ -132,7 +132,7 @@ def model(X_train, Y_train, X_test, Y_test, num_iterations=2000,
     """
     w, b = initializePramaters(X_train.shape[1])
     w, b, costs = optimize(w, b, X_train, Y_train, num_iterations, learning_rate, print_cost, withBias)
-    YpredTrain,_ = predict(X_train, w, b, Y_train)
+    YpredTrain, _ = predict(X_train, w, b, Y_train)
     YpredTest, _ = predict(X_test, w, b, Y_test)
     print("Train accuracy :", YpredTrain)
     print("Test accuracy :", YpredTest)
@@ -210,4 +210,4 @@ def predict(X, w, b, actual):
         if actual[index] == predicted[index]:
             acc = acc + 1
 
-    return (acc / X.shape[0]) * 100,get_confusion_matrix(predicted=predicted,actual=actual)
+    return (acc / X.shape[0]) * 100, get_confusion_matrix(predicted=predicted, actual=actual)

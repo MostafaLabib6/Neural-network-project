@@ -13,9 +13,10 @@ class MainController:
         self.service = dpp.DataPreProcessingService()
         self.data = self.service.SharedPreProcessing()
         self.data = self.service.SharedPreProcessing()
+
     def reset(self):
         self.service.reset()
-        self.data= self.service.SharedPreProcessing()
+        self.data = self.service.SharedPreProcessing()
 
     # instance method
     def classFillter(self, class1: str, class2: str):
@@ -30,17 +31,19 @@ class MainController:
 
     def trainModel(self, learning_rate=0.01, bais=False, epochs=2000):
         self.w, self.b = helper.model(X_train=self.train, learning_rate=learning_rate, withBias=bais,
-                                      num_iterations=epochs, Y_train=self.y, X_test=self.test, Y_test=self.ytest)
+                                      num_iterations=epochs, Y_train=self.y, X_test=self.test, Y_test=self.ytest,
+                                      print_cost=True)
 
     def testModel(self):
         acc, Cmatrx = helper.predict(self.test, self.w, self.b, self.ytest)
         self.test = self.test.to_numpy()
         index = np.argmin(self.test[0])
         self.test[0][index] = self.b
+        plt.figure(figsize=(6, 5))
         sns.scatterplot(data=self.data, x=self.f1, y=self.f2, hue='species')
         plt.plot(self.test[0], ((-self.w[0] / self.w[1]) * self.test[0] - self.b / self.w[1]), color='k')
         plt.show()
-        fig, ax = plt.subplots(figsize=(7.5, 7.5))
+        fig, ax = plt.subplots(figsize=(6, 5))
         ax.matshow(Cmatrx, cmap=plt.cm.Blues, alpha=0.3)
         for i in range(Cmatrx.shape[0]):
             for j in range(Cmatrx.shape[1]):

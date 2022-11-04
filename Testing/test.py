@@ -22,9 +22,9 @@ testgento = gentoData[30:50]
 
 train = trainadelie.append(traingento)
 test = testadelie.append(testgento)
-sns.scatterplot(data=test, x='bill_depth_mm', y='bill_length_mm', hue='species')
-train = train[['species', 'bill_depth_mm', 'bill_length_mm']]
-test = test[['species', 'bill_depth_mm', 'bill_length_mm']]
+sns.scatterplot(data=test, x='flipper_length_mm', y='bill_depth_mm', hue='species')
+train = train[['species', 'flipper_length_mm', 'bill_depth_mm']]
+test = test[['species', 'flipper_length_mm', 'bill_depth_mm']]
 train.sample(frac=1)
 
 y = train['species']
@@ -38,7 +38,7 @@ ytest = ytest.to_numpy().reshape((-1, 1))
 w, b = helper.model(train, y, test, ytest, 600, 0.01, True, True)
 
 test = test.to_numpy()
-index=np.argmin(test[0])
-test[0][index]=b
+index = np.argmin(test[0])
+test[0][index] = b
 plt.plot(test[0], ((-w[0] / w[1]) * test[0] - b / w[1]), color='k')
 plt.show()
