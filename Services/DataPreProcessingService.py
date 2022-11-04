@@ -1,14 +1,13 @@
 import pandas as pd
-from dependency_injector.wiring import Provide, inject
 import numpy as np
-from dependency_injector.wiring import Provide, inject
 
-@inject
+
 class DataPreProcessingService:
 # instance attributes
  def __init__(self):
    self.data=pd.read_csv('penguins.csv')
-   
+ def reset(self):
+    self.data=pd.read_csv('penguins.csv')
  def classFillter(self, class1,class2):
    if class1=="Adelie" and class2=="Gentoo":
       self.data=self.data.iloc[:100,:]

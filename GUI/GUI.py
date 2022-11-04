@@ -47,6 +47,7 @@ class GUI:
         self.class1['values'] = self.ModifiedclassList
 
     def train(self):
+        self.controller.reset()
         if self.selected_feature1.get() and self.selected_class1.get() and self.selected_class2.get() and self.selected_feature2.get():
             self.controller.classFillter(class1=self.selected_class1.get(), class2=self.selected_class2.get())
             self.controller.FeatureFillter(feat1=self.selected_feature1.get(), feat2=self.selected_feature2.get())
