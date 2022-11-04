@@ -154,7 +154,7 @@ def get_confusion_matrix(predicted, actual):
     """
     tp, fp, tn, fn = (0, 0, 0, 0)
     predicted = predicted.to_numpy()
-    actual = actual.to_numpy()
+    # actual = actual.to_numpy()
     print(predicted)
     for i in range(len(predicted)):
         if predicted[i] == 1:
@@ -213,4 +213,4 @@ def predict(X, w, b, actual):
         if actual[index] == predicted[index]:
             acc = acc + 1
 
-    return (acc / X.shape[0]) * 100
+    return (acc / X.shape[0]) * 100,get_confusion_matrix(predicted=predicted,actual=actual)
