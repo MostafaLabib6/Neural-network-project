@@ -2,14 +2,17 @@ import numpy as np
 import model.model_functions as NN
 import matplotlib.pyplot as plt
 import seaborn as sns
-from dependency_injector.wiring import Provide, inject
+
 import Services.DataPreProcessingService as dpp
-@inject
+
 class MainController:
 
 # instance attributes
    def __init__(self):
         self.service = dpp.DataPreProcessingService()
+        self.data= self.service.SharedPreProcessing()
+   def reset(self):
+        self.service.reset()
         self.data= self.service.SharedPreProcessing()
 
     # instance method
