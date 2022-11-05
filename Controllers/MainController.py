@@ -11,7 +11,6 @@ class MainController:
     def __init__(self):
         self.service = dpp.DataPreProcessingService()
         self.data = self.service.SharedPreProcessing()
-        self.data = self.service.SharedPreProcessing()
 
     def reset(self):
         self.service.reset()
