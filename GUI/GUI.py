@@ -10,6 +10,12 @@ class GUI:
         userInput = self.tInput.get()
         return userInput
 
+    def setAccuarcy(self, acc):
+        self.accuarcyEntry.configure(state='normal')
+        self.accuarcyEntry.delete(0, END)
+        self.accuarcyEntry.insert(0, str(acc))
+        self.accuarcyEntry.configure(state='disable')
+
     # this is a function to get the user input from the text input box
     def getEpochs(self):
         userInput = self.secondtextbox.get()
@@ -49,9 +55,10 @@ class GUI:
         if self.selected_feature1.get() and self.selected_class1.get() and self.selected_class2.get() and self.selected_feature2.get():
             self.controller.classFillter(class1=self.selected_class1.get(), class2=self.selected_class2.get())
             self.controller.FeatureFillter(feat1=self.selected_feature1.get(), feat2=self.selected_feature2.get())
-            self.controller.trainModel(learning_rate=float(self.getLearningRate()), bais=self.getBais(),
-                                       epochs=int(self.getEpochs()))
+            acc = self.controller.trainModel(learning_rate=float(self.getLearningRate()), bais=self.getBais(),
+                                             epochs=int(self.getEpochs()))
             self.controller.testModel()
+            self.setAccuarcy(acc)
 
     def showplots(self):
         self.controller.showGraphs()
@@ -80,8 +87,11 @@ class GUI:
         self.secondtextbox = Entry(self.root, width=25)
         self.secondtextbox.place(x=140, y=223)
 
+        self.accuarcyEntry = Entry(self.root, width=5, state='disable', font=('arial', 16, 'bold'))
+        self.accuarcyEntry.place(x=510, y=270)
         # This is the section of code which creates the a label
         Label(self.root, text='Enter Step Size', bg='#F0F8FF', font=('arial', 12, 'normal')).place(x=10, y=170)
+        Label(self.root, text='Accuracy', bg='#F0F8FF', font=('arial', 12, 'normal')).place(x=430, y=270)
 
         # This is the section of code which creates the a label
         Label(self.root, text='Enter Epochs', bg='#F0F8FF', font=('arial', 12, 'normal')).place(x=10, y=220)

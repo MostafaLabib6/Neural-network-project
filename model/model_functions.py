@@ -137,7 +137,7 @@ def model(X_train, Y_train, X_test, Y_test, num_iterations=2000,
     print("Train accuracy :", YpredTrain)
     print("Test accuracy :", YpredTest)
 
-    return w, b
+    return w, b,YpredTest
 
 
 def get_confusion_matrix(predicted, actual):
