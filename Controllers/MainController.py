@@ -2,7 +2,6 @@ import numpy as np
 import model.model_functions as helper
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 import Services.DataPreProcessingService as dpp
 
 
@@ -30,15 +29,19 @@ class MainController:
         self.y, self.ytest, self.train, self.test = self.service.FeatureFillter(feat1=feat1, feat2=feat2)
 
     def trainModel(self, learning_rate=0.01, bais=False, epochs=2000):
-        self.w, self.b = helper.model(X_train=self.train, learning_rate=learning_rate, withBias=bais,
-                                      num_iterations=epochs, Y_train=self.y, X_test=self.test, Y_test=self.ytest,
-                                      print_cost=True)
+        self.w, self.b, self.acc = helper.model(X_train=self.train, learning_rate=learning_rate, withBias=bais,
+                                                num_iterations=epochs, Y_train=self.y, X_test=self.test,
+                                                Y_test=self.ytest,
+                                                print_cost=True)
+        return self.acc
 
     def testModel(self):
         acc, Cmatrx = helper.predict(self.test, self.w, self.b, self.ytest)
         self.test = self.test.to_numpy()
         index = np.argmin(self.test[0])
-        self.test[0][index] = self.b
+        ind = np.argmax(self.test[0])
+        self.test[0][index] = -5
+        self.test[0][ind] = 5
         plt.figure(figsize=(6, 5))
         sns.scatterplot(data=self.data, x=self.f1, y=self.f2, hue='species')
         plt.plot(self.test[0], ((-self.w[0] / self.w[1]) * self.test[0] - self.b / self.w[1]), color='k')
@@ -53,7 +56,7 @@ class MainController:
         plt.ylabel('Actual', fontsize=18)
         plt.title('Confusion Matrix', fontsize=18)
         fig.show()
-#
+        #
         return acc
 
     def showGraphs(self):

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 
 class DataPreProcessingService:
@@ -54,4 +55,6 @@ class DataPreProcessingService:
 
         self.data = self.data.fillna(self.data['gender'].value_counts().index[0])
         self.data["gender"] = np.where(self.data["gender"] == "male", 1, 0)
+        scaler = StandardScaler()
+        self.data.iloc[:, 1:] = scaler.fit_transform(self.data.iloc[:, 1:])
         return self.data
