@@ -10,7 +10,7 @@ class DataPreProcessingService:
     def reset(self):
         self.data = pd.read_csv('penguins.csv')
 
-    def classFillter(self, class1, class2):
+    def classFilter(self, class1, class2):
         if class1 == "Adelie" and class2 == "Gentoo":
             self.data = self.data.iloc[:100, :]
         if class1 == "Adelie" and class2 == "Chinstrap":
@@ -27,7 +27,7 @@ class DataPreProcessingService:
 
         return self.data
 
-    def FeatureFillter(self, feat1: str, feat2: str):
+    def FeatureFilter(self, feat1: str, feat2: str):
         self.data = self.data
         class1Data = self.data[:50]
         class2Data = self.data[50:100]
