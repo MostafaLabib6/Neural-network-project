@@ -1,0 +1,100 @@
+Features: flipper_length_mm, bill_depth_mm
+Classes : Adelie, Gentoo
+Train accuracy : 100.0
+Test accuracy : 100.0
+Classes : Adelie, Chinstrap
+Train accuracy : 53.333333333333336
+Test accuracy : 52.5
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 92.5
+Features: flipper_length_mm, bill_length_mm
+Classes : Adelie, Gentoo
+Train accuracy : 100.0
+Test accuracy : 100.0
+Classes : Adelie, Chinstrap
+Train accuracy : 98.33333333333333
+Test accuracy : 92.5
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 92.5
+Features: flipper_length_mm, gender
+Classes : Adelie, Gentoo
+Train accuracy : 100.0
+Test accuracy : 100.0
+Classes : Adelie, Chinstrap
+Train accuracy : 50.0
+Test accuracy : 50.0
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 90.0
+Features: flipper_length_mm, body_mass_g
+Classes : Adelie, Gentoo
+Train accuracy : 100.0
+Test accuracy : 97.5
+Classes : Adelie, Chinstrap
+Train accuracy : 50.0
+Test accuracy : 52.5
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 85.0
+Features: bill_depth_mm, bill_length_mm
+Classes : Adelie, Gentoo
+Train accuracy : 100.0
+Test accuracy : 97.5
+Classes : Adelie, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 97.5
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 97.5
+Features: bill_depth_mm, gender
+Classes : Adelie, Gentoo
+Train accuracy : 100.0
+Test accuracy : 95.0
+Classes : Adelie, Chinstrap
+Train accuracy : 53.333333333333336
+Test accuracy : 50.0
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 95.0
+Features: bill_depth_mm, body_mass_g
+Classes : Adelie, Gentoo
+Train accuracy : 100.0
+Test accuracy : 97.5
+Classes : Adelie, Chinstrap
+Train accuracy : 50.0
+Test accuracy : 50.0
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 100.0
+Features: bill_length_mm, gender
+Classes : Adelie, Gentoo
+Train accuracy : 93.33333333333333
+Test accuracy : 95.0
+Classes : Adelie, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 95.0
+Classes : Gentoo, Chinstrap
+Train accuracy : 50.0
+Test accuracy : 50.0
+Features: bill_length_mm, body_mass_g
+Classes : Adelie, Gentoo
+Train accuracy : 93.33333333333333
+Test accuracy : 90.0
+Classes : Adelie, Chinstrap
+Train accuracy : 93.33333333333333
+Test accuracy : 95.0
+Classes : Gentoo, Chinstrap
+Train accuracy : 100.0
+Test accuracy : 97.5
+Features: gender, body_mass_g
+Classes : Adelie, Gentoo
+Train accuracy : 81.66666666666667
+Test accuracy : 75.0
+Classes : Adelie, Chinstrap
+Train accuracy : 50.0
+Test accuracy : 50.0
+Classes : Gentoo, Chinstrap
+Train accuracy : 90.0
+Test accuracy : 87.5
