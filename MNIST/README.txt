@@ -1,7 +1,7 @@
-DATA LINK:
+**DATA LINK:**
 https://www.kaggle.com/datasets/oddrationale/mnist-in-csv
-
-
+----
+**Data Descreption**
 The mnist_train.csv file contains the 60,000 training examples and labels.
 The mnist_test.csv contains 10,000 test examples and labels.
 Each row consists of 785 values:
