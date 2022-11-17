@@ -39,7 +39,6 @@ def forwardPord(W, b, X):
             --> A signum (net)
 
     """
-
     Z = W.T @ X + b
     A = signum(Z)
     return A
@@ -53,7 +52,6 @@ def computeCost(actual, predicted):
     :return:
             -->cost value
     """
-
     cost = actual - predicted
 
     return cost
@@ -68,7 +66,6 @@ def backwordProb(X, cost, withBias=False):
     :return:
             --> grads dictionary of dw ,db
     """
-
     dw = X * cost
     db = 0
     if withBias == True:
