@@ -52,7 +52,7 @@ class DataPreProcessingService:
         return y, ytest, train, test
 
     def SharedPreProcessing(self):
-
+        np.random.seed(10)
         self.data = self.data.fillna(self.data['gender'].value_counts().index[0])
         self.data["gender"] = np.where(self.data["gender"] == "male", 1, 0)
         scaler = StandardScaler()

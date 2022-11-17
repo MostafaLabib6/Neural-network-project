@@ -62,4 +62,6 @@ class MainController:
 
         return acc
     def showGraphs(self):
-        helper.plots(self.data)
+        self.service.reset()
+        data = self.service.SharedPreProcessing()
+        helper.plots(data)
