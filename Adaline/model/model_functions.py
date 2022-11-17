@@ -1,7 +1,11 @@
+import random
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+random.seed(10)
 
 
 def signum(x):
@@ -80,7 +84,6 @@ def backwordProb(X, cost, withBias=False):
 
 
 def optimize(w, b, X, Y, numIter, learning_rate, mseThrashold, print_cost=False, withBias=False):
-
     """
 
     :param w: weights, array
