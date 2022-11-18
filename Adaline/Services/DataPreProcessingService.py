@@ -55,6 +55,6 @@ class DataPreProcessingService:
         np.random.seed(10)
         self.data = self.data.fillna(self.data['gender'].value_counts().index[0])
         self.data["gender"] = np.where(self.data["gender"] == "male", 1, 0)
-        scaler = StandardScaler()
-        self.data.iloc[:, 1:] = scaler.fit_transform(self.data.iloc[:, 1:])
+
+        self.data.iloc[:, 1:] = (self.data.iloc[:, 1:] - self.data.iloc[:, 1:].mean()) / self.data.iloc[:, 1:].std()
         return self.data

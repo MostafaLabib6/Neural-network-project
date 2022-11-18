@@ -117,6 +117,7 @@ def optimize(w, b, X, Y, numIter, learning_rate, mseThrashold, print_cost=False,
             costs.append(mse)
             print("Cost after iteration %i: %f" % (i, mse))
         if (mse < mseThrashold).bool():
+            print("mes ",i)
             return w, b, costs
 
     return w, b, costs
