@@ -5,6 +5,8 @@ import seaborn as sns
 import Services.DataPreProcessingService as dpp
 
 np.random.seed(10)
+
+
 class MainController:
 
     # instance attributes
@@ -35,7 +37,7 @@ class MainController:
                                                 print_cost=True)
         return self.acc
 
-    def testModel(self,bais):
+    def testModel(self, bais):
         acc, Cmatrx = helper.predict(self.test, self.w, self.b, self.ytest)
         self.test = self.test.to_numpy()
         index = np.argmin(self.test[0])
@@ -61,6 +63,7 @@ class MainController:
         fig.show()
 
         return acc
+
     def showGraphs(self):
         self.service.reset()
         data = self.service.SharedPreProcessing()
