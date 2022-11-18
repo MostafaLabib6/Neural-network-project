@@ -7,14 +7,19 @@ from Controllers.MainController import MainController
 class GUI:
     # # this is a function to get the user input from the text input box
     def getLearningRate(self):
-        userInput = self.tInput.get()
+        try:
+            userInput = float(self.tInput.get())
+        except:
+            userInput = 0.01
         return userInput
 
     def getmseThrashold(self):
-        out = self.mseThrashold.get()
-        if isinstance(out, str):
-            out = 0
-        return out
+        try:
+            mse = float(self.mseThrashold().get())
+        except:
+            mse = 0
+
+        return mse
 
     def setAccuracy(self, acc):
         self.accuarcyEntry.configure(state='normal')
@@ -24,7 +29,10 @@ class GUI:
 
     # this is a function to get the user input from the text input box
     def getEpochs(self):
-        userInput = self.secondtextbox.get()
+        try:
+            userInput = int(self.secondtextbox.get())
+        except:
+            userInput = 1000
         return userInput
 
     # this is a function to check the status of the checkbox (1 means checked, and 0 means unchecked)
@@ -62,7 +70,7 @@ class GUI:
             self.controller.filter_byClass(class1=self.selected_class1.get(), class2=self.selected_class2.get())
             self.controller.filter_byFeature(feat1=self.selected_feature1.get(), feat2=self.selected_feature2.get())
             acc = self.controller.trainModel(learning_rate=float(self.getLearningRate()), bais=self.getBais(),
-                                             mseThrashold=float(self.getmseThrashold()),
+                                             mseThrashold=self.getmseThrashold(),
                                              epochs=int(self.getEpochs()))
             self.controller.testModel(self.getBais())
             self.setAccuracy(acc)
