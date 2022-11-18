@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import Services.DataPreProcessingService as dpp
 
-
+np.random.seed(10)
 class MainController:
 
     # instance attributes
