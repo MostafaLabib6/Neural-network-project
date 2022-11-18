@@ -11,7 +11,10 @@ class GUI:
         return userInput
 
     def getmseThrashold(self):
-        return self.mseThrashold.get()
+        out = self.mseThrashold.get()
+        if isinstance(out, str):
+            out = 0
+        return out
 
     def setAccuracy(self, acc):
         self.accuarcyEntry.configure(state='normal')

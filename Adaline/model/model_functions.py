@@ -5,7 +5,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-random.seed(10)
+np.random.seed(10)
 
 
 def signum(x):
@@ -113,7 +113,7 @@ def optimize(w, b, X, Y, numIter, learning_rate, mseThrashold, print_cost=False,
 
         Error = np.square(Y - X @ w + b);
         mse = (1 / (2 * m)) * np.sum(Error)
-        if i % 100 == 0 and print_cost == True:
+        if i % 100 == 0 and print_cost is True:
             costs.append(mse)
             print("Cost after iteration %i: %f" % (i, mse))
         if (mse < mseThrashold).bool():
