@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -11,23 +9,28 @@ np.random.seed(10)
 def sigmoid(x):
     """
     compute signum of x
+    param x : ndarray vector
 
     returns
-    1 -- if input greater than 0
-   -1 -- if input less than 0
-
+        -->1 / (1 + np.exp(-x)) same shape as x
     """
+
     return 1 / (1 + np.exp(-x))
 
 
 def tanh(x):
+    """
+
+    """
     return np.tanh(x)
 
 
-def sigmoid_backward(A):
+def sigmoid_backward(dA, Z):
     # (e^-x)/(1+e^-x)^2
-    s = np.exp(-A) / (1 + np.exp(-A)) ** 2
-    return s
+    s = sigmoid(Z)
+    print('Z.shape', Z.shape)
+
+    return dA * s * (1 - s)
 
 
 def tanh_backward(x):
@@ -68,7 +71,7 @@ def transform(A_prev, W, b, actvaion="sigomid"):
     elif actvaion == "tanh":
         A = tanh(Z)
 
-    cache = (A, W, b)
+    cache = (A, W, b, Z)
 
     return A, cache
 
@@ -89,13 +92,17 @@ def forwardPord(X, parameters, activation="sigmoid"):
 
     L = len(parameters) // 2
     A_prev = X
+    # print("L", L)
+    # print("X.shape", X.shape)
     caches = []
     for l in range(1, L + 1):
+        # print("W" + str(l) + ": ", parameters["W" + str(l)].shape)
         A, cache = transform(A_prev, parameters["W" + str(l)], parameters["b" + str(l)], activation)
+
         A_prev = A
         caches.append(cache)
 
-    return A
+    return A, caches
 
 
 def computeCost(AOutput, Y):
@@ -113,15 +120,30 @@ def computeCost(AOutput, Y):
     return cost
 
 
-# par = initializePramaters([10, 3, 2])
-# X = np.ones((10, 10))
-# Y = np.ones((1, 10))
-# A = forwardPord(X, par, "sigmoid")
-# cost = computeCost(A, Y)
-# print(cost)
+def transform_activation_backward(dA, cache, activation="sigmoid"):
+    A_prev, W, b, Z = cache
+    print('*&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+    print('A_prev shape', A_prev.shape)
+    print('W shape', W.shape)
+    print('b shape', b.shape)
+    m = A_prev.shape[1]
+    if activation == "sigmoid":
+        dZ = sigmoid_backward(dA, Z)
+    else:
+        dZ = tanh_backward(dA, Z)
+    print('dZ shape', dZ.shape)
+    dW = (1 / m) * (dZ @ A_prev.T)
+    db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+    dA_prev = W.T @ dZ
+    print('dW shape', dW.shape)
+    print('db shape', db.shape)
+    print('dA_prev shape', dA_prev.shape)
+    print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+
+    return dW, db, dA_prev
 
 
-def backwordProb(A, Y, caches, flag=True):
+def backward_prob(AL, Y, caches, activation="sigmoid"):
     """
 
     :param cost: Actual -Predicted
@@ -132,23 +154,39 @@ def backwordProb(A, Y, caches, flag=True):
     dw=,db,da=W@dZ
     dw=dA_prev*driv
     """
-    dA = np.subtract(Y, A)
-    driv = 0
-    if flag is True:
-        driv = sigmoid_backward(A)
-    elif flag is False:
-        driv = tanh_backward(A)
+    print('AL', AL.shape)
+    print('Y.shape', Y.shape)
 
-    dZ = dA * driv
-# cur_cache=caches[l] -->A,W,B
-#   prev_sige*W*simoid_prob(A)
+    grads = {}
+    L = len(caches)
+    print('L.shape', L)
+    print('*************************input***********')
 
+    dA = np.subtract(Y, AL)
+    print('dA', dA.shape)
+    current_cache = caches[L - 1]
+    grads["dW" + str(L)], grads["db" + str(L)], grads["dA" + str(L - 1)] = transform_activation_backward(dA,
+                                                                                                         current_cache,
+                                                                                                         activation)
+    print("*********************************")
+    print('dW' + str(L), grads["dW" + str(L)].shape)
+    print('db' + str(L), grads["db" + str(L)].shape)
+    print('dA' + str(L - 1), grads["dA" + str(L - 1)].shape)
 
+    for l in reversed(range(L - 1)):
+        current_cache = caches[l]
+        grads["dW" + str(l + 1)], grads["db" + str(l + 1)], grads["dA" + str(l)] = transform_activation_backward(
+            grads["dA" + str(l + 1)],
+            current_cache,
+            activation)
+        print('dW' + str(l + 1), grads["dW" + str(l + 1)].shape)
+        print('db' + str(l + 1), grads["db" + str(l + 1)].shape)
+        print('dA' + str(l), grads["dA" + str(l)].shape)
 
     return grads
 
 
-def optimize(w, b, X, Y, numIter, learning_rate, mseThrashold, print_cost=False, withBias=False):
+def update_parameters(parameters, grads, learning_rate):
     """
 
     :param w: weights, array
@@ -163,56 +201,34 @@ def optimize(w, b, X, Y, numIter, learning_rate, mseThrashold, print_cost=False,
             --> learned weights
             --> cost vector values
     """
-    costs = []
-    m = X.shape[0]
-    for i in range(0, numIter):
-        for index, x in X.reset_index(drop=True).iterrows():
-            x = x.to_numpy().reshape((-1, 1))
+    L = len(parameters) // 2  # number of layers in the neural network
 
-            A = forwardPord(w, b, x)
-            cost = computeCost(Y[index], A)
-            grads = backwordProb(x, cost, withBias)
+    for l in range(L):
+        print(parameters["W" + str(l + 1)].shape)
+        print(grads["dW" + str(l + 1)].shape)
+        parameters["W" + str(l + 1)] = parameters["W" + str(l + 1)] - learning_rate * grads["dW" + str(l + 1)]
+        parameters["b" + str(l + 1)] = parameters["b" + str(l + 1)] - learning_rate * grads["db" + str(l + 1)]
 
-            dw = grads["dw"]
-            db = grads["db"]
-            # btw if withBias boolean value equals false the returned value for db equal false
-            w = w + (learning_rate * dw)
-            b = b + (learning_rate * db)
-
-        Error = np.square(Y - X @ w + b);
-        mse = (1 / (2 * m)) * np.sum(Error)
-        if i % 100 == 0 and print_cost is True:
-            costs.append(mse)
-            print("Cost after iteration %i: %f" % (i, mse))
-        if (mse < mseThrashold).bool():
-            print("mes ", i)
-            return w, b, costs
-
-    return w, b, costs
+    return parameters
 
 
-def model(X_train, Y_train, X_test, Y_test, num_iterations=2000,
-          learning_rate=0.01, mseThrashold=0.05, print_cost=False, withBias=False):
-    """
-    :param X_train: input vector of size (2,m)
-    :param Y_train: Training Actual value Vector
-    :param X_test: test vector of size (2,m)
-    :param Y_test: Testing Actual value Vector
-    :param learning_rate: step size
-    :param print_cost: flag for print cost values
-    :param withBias: flag for Bias
-    :return:
-            --> weighted vector
-            --> scaler value
-    """
-    w, b = initializePramaters(X_train.shape[1])
-    w, b, costs = optimize(w, b, X_train, Y_train, num_iterations, learning_rate, mseThrashold, print_cost, withBias)
-    YpredTrain, _ = predict(X_train, w, b, Y_train)
-    YpredTest, _ = predict(X_test, w, b, Y_test)
-    print("Train accuracy :", YpredTrain)
-    print("Test accuracy :", YpredTest)
+def run():
+    dim = [5, 4, 3, 1]
+    X = np.random.randn(5, 4) * 0.01
+    Y = np.ones((1, 4))
+    par = initializePramaters(dim)
+    # for l in range(1, len(dim)):
+    # print("W :", par["W" + str(l)].shape)
+    # print("b :", par["b" + str(l)].shape)
+    # print('***********************************')
+    AL, caches = forwardPord(X, par, "sigmoid")
+    # print('A :', A)
+    cost = computeCost(AL, Y)
+    # print("cost ", cost)
+    # print("len of caches", len(caches))
 
-    return w, b, YpredTest
+    grads = backward_prob(AL, Y, caches, "sigmoid")
+    update_parameters(par, grads, 0.01)
 
 
 def get_confusion_matrix(predicted, actual):
@@ -279,10 +295,13 @@ def predict(X, w, b, actual):
     acc = 0
     predicted = X @ w + b
     predicted = pd.DataFrame(predicted)
-    predicted = predicted[0].apply(signum)
+    predicted = predicted[0].apply(sigmoid)
     predicted = predicted.reset_index(drop=True)
     for index in range(X.shape[0]):
         if actual[index] == predicted[index]:
             acc = acc + 1
 
     return (acc / X.shape[0]) * 100, get_confusion_matrix(predicted=predicted, actual=actual)
+
+
+run()
