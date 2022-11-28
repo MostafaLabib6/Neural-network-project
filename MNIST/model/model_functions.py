@@ -13,6 +13,7 @@ def sigmoid(x):
 
     returns
         -->1 / (1 + np.exp(-x)) same shape as x
+        sigmoid(-input)
     """
 
     return 1 / (1 + np.exp(-x))
@@ -20,168 +21,219 @@ def sigmoid(x):
 
 def tanh(x):
     """
+    compute tanh of input vector
+    param x : ndarray vector
 
+    returns
+        --> (1-e^(-x))/(1+e^(-x)) same shape as x
+        tanh(-input)
     """
+
     return np.tanh(x)
 
 
 def sigmoid_backward(dA, Z):
-    # (e^-x)/(1+e^-x)^2
+    """
+    compute (sigmoid derivative  of input vector)*previous sigma
+    param Z: ndarray vector
+    param dA : previous roo
+
+    returns
+        -->dA * s * (1 - s)
+    """
+
     s = sigmoid(Z)
-    print('Z.shape', Z.shape)
 
     return dA * s * (1 - s)
 
 
-def tanh_backward(x):
-    return 1 - np.tanh(x) ** 2
-
-
-def initializePramaters(dim):
-    # input hiddens
+def tanh_backward(dA, Z):
     """
-    create w with shape (dim,1) and b scaler value
+    compute (tanh derivative  of input vector)*previous sigma
+    param Z: ndarray vector
+    param dA : previous roo
+
+    returns
+        -->dA * (1-tanh(Z)**2)
+    """
+
+    return dA * (1 - np.tanh(Z) ** 2)
+
+
+def initialize_parameters(dim):
+    """
+    compute weights metrix and biases vectors
+    we suppose that input features concatenated with hidden layers list
+    dim[10,3,2,1]--> that mean input layer has 10 features
+
+    param dim :list of hidden layer
+
+    returns
+        --> parameters dictionary that contains our initialized weights and biases
+
+    create w with shape (dim[l],dim[l-1]) and b vector (dim[1],1)
     10,3,2,1
-
-    W1=(3,10)*X(5,160000)
+  ------------------------
+    W1=(3,10)
+    b1=(3,10)
     W2=(2,3)
+    b2=(2,1)
     W3=(1,2)
+    b3=(1,1)
+
     """
-    parameters = {}
+
+    parameters = {}  # dictionary that contains our parameters
     L = len(dim)
-    for l in range(1, L):
-        parameters["W" + str(l)] = np.random.randn(dim[l], dim[l - 1]) * 0.01
-        parameters["b" + str(l)] = np.zeros((dim[l], 1))
+
+    for layer_index in range(1, L):
+        parameters["W" + str(layer_index)] = np.random.randn(dim[layer_index], dim[layer_index - 1]) * 0.01
+        parameters["b" + str(layer_index)] = np.zeros((dim[layer_index], 1))
+        print('W' + str(layer_index), parameters["W" + str(layer_index)].shape)
+        print('b' + str(layer_index), parameters["b" + str(layer_index)].shape)
+    print('--------------------------------')
     return parameters
 
 
-# par = initializePramaters([10, 3, 2, 1])
-# for l in range(1, 4):
-#     print(par["W" + str(l)].shape)
-#     print(par["b" + str(l)].shape)
-#     print('---------------------')
-#     print(len(par))
+def transform_activation_forward(A_prev, W, b, activation="sigmoid"):
+    """
+    compute sigmoid | tanh for linear activation function
+    param A_prev: input for hidden layer
+    param W : weights matrix for this layer
+    param b : bias vector for this layer
+    param activation : activation function for this layer
 
+    returns
+        -->
+        A :
+        cache : that contains input , weights ,bias and Z for this layer
+    """
 
-def transform(A_prev, W, b, actvaion="sigomid"):
-    A = 0
-    Z = W @ A_prev + b
-    if actvaion == "sigmoid":
+    Z = W @ A_prev + b  # linear activation function
+    if activation == "sigmoid":
         A = sigmoid(Z)
-    elif actvaion == "tanh":
+    elif activation == "tanh":
         A = tanh(Z)
+    else:
+        raise Exception("Please Enter activation function ")
 
-    cache = (A, W, b, Z)
+    cache = (A_prev, W, b, Z)
 
     return A, cache
 
 
-def forwardPord(X, parameters, activation="sigmoid"):
+def forward_propagation(X, parameters, activation="sigmoid"):
     """
-    compute linear activation function
-    :param W : initialized  wighted vector
-    :param b : scaler value (bias)
-    :param X : input vector of size (2,m) where is 2 number of columns and m numbers of rows=60
+    implement forward propagation -->LOOP ( linear-->Activation )
+
+    :param X : input data ndarray
+    :param parameters : initialized weights and biases
+    :param activation: activation function
     :return:
-            --> A signum (net)
-    for(hidden)
-    A?
-    X=A?
+            --> AL : last output vector
+            -->caches :last of tuples contains ( input ,weights, bias, linear activation function )
+
 
     """
 
     L = len(parameters) // 2
-    A_prev = X
-    # print("L", L)
-    # print("X.shape", X.shape)
+    A = X
     caches = []
-    for l in range(1, L + 1):
-        # print("W" + str(l) + ": ", parameters["W" + str(l)].shape)
-        A, cache = transform(A_prev, parameters["W" + str(l)], parameters["b" + str(l)], activation)
 
+    for layer_index in range(1, L + 1):
         A_prev = A
+        A, cache = transform_activation_forward(A_prev, parameters["W" + str(layer_index)],
+                                                parameters["b" + str(layer_index)], activation)
         caches.append(cache)
 
     return A, caches
 
 
-def computeCost(AOutput, Y):
+def computeCost(output_A, Y):
     """
-    :param actual:  actual value
-    :param predicted: signum(weighted @ input + b)
+    compute between actual vector and predicted vector
+    :param output_A: probability vector for output layer
+    :param Y: actual value true label
     :return:
-            -->cost value
-            -1/mYlog(yhat)+(1-Y)log(1-yhat)
+            --> cost : (-1 / m) * (Y @ np.log(output_A).T + (1 - Y) @ np.log(1 - output_A).T)
+
     """
+
     m = Y.shape[1]
-    cost = (-1 / m) * (Y @ np.log(AOutput).T + (1 - Y) @ np.log(1 - AOutput).T)
-    cost = np.squeeze(cost)
+    cost = (-1 / m) * (Y @ np.log(output_A).T + (1 - Y) @ np.log(1 - output_A).T)
+    cost = np.squeeze(cost)  # to remove extra []
 
     return cost
 
 
 def transform_activation_backward(dA, cache, activation="sigmoid"):
+    """
+    compute dW :Gradiant of cost relative for W
+    ,dB : derivation of cost relative for bias
+    ,A_prev : compute new input for previous layer
+
+    param dA: input for hidden layer ( backward )
+    param cache : tuple that contains ( input ,weights, bias, linear activation function )
+    param activation : activation function for this layer
+
+    returns
+        -->
+        dW : metrix to update weights
+        db : vector to update biases
+        prev_A : new input for previous layer
+    """
+
     A_prev, W, b, Z = cache
-    print('*&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-    print('A_prev shape', A_prev.shape)
-    print('W shape', W.shape)
-    print('b shape', b.shape)
     m = A_prev.shape[1]
+
     if activation == "sigmoid":
         dZ = sigmoid_backward(dA, Z)
     else:
         dZ = tanh_backward(dA, Z)
-    print('dZ shape', dZ.shape)
-    dW = (1 / m) * (dZ @ A_prev.T)
-    db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+
+    dW = (1 / m) * (dZ @ A_prev.T)  # where is dZ is previous roo * derivative of sigmoid
+    db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)  # keep output dims as input dims
     dA_prev = W.T @ dZ
-    print('dW shape', dW.shape)
-    print('db shape', db.shape)
-    print('dA_prev shape', dA_prev.shape)
-    print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
 
     return dW, db, dA_prev
 
 
-def backward_prob(AL, Y, caches, activation="sigmoid"):
+def backward_propagation(AL, Y, caches, activation="sigmoid"):
     """
 
-    :param cost: Actual -Predicted
-    :param X: input vector of size (2,m) where is 2 number of columns and m numbers of rows=60
-    :param withBias: boolean for using Bias or not
+    :param AL: predicated vector
+    :param Y: actual vector
+    :param caches: list of tuples that contains ( input ,weights, bias, linear activation function )
+    :param activation: activation function
+
     :return:
-            --> grads dictionary of dw ,db
-    dw=,db,da=W@dZ
-    dw=dA_prev*driv
+            --> grads dictionary of dw ,db,dA
+             grads["dW" + str(l)] = ...
+             grads["db" + str(l)] = ...
     """
-    print('AL', AL.shape)
-    print('Y.shape', Y.shape)
 
     grads = {}
     L = len(caches)
-    print('L.shape', L)
-    print('*************************input***********')
 
-    dA = np.subtract(Y, AL)
-    print('dA', dA.shape)
+    dAL = np.subtract(Y, AL)
+
     current_cache = caches[L - 1]
-    grads["dW" + str(L)], grads["db" + str(L)], grads["dA" + str(L - 1)] = transform_activation_backward(dA,
+    grads["dW" + str(L)], grads["db" + str(L)], grads["dA" + str(L - 1)] = transform_activation_backward(dAL,
                                                                                                          current_cache,
                                                                                                          activation)
-    print("*********************************")
-    print('dW' + str(L), grads["dW" + str(L)].shape)
-    print('db' + str(L), grads["db" + str(L)].shape)
-    print('dA' + str(L - 1), grads["dA" + str(L - 1)].shape)
 
-    for l in reversed(range(L - 1)):
-        current_cache = caches[l]
-        grads["dW" + str(l + 1)], grads["db" + str(l + 1)], grads["dA" + str(l)] = transform_activation_backward(
-            grads["dA" + str(l + 1)],
+    for layer_index in reversed(range(L - 1)):
+        current_cache = caches[layer_index]
+
+        grads["dW" + str(layer_index + 1)], grads["db" + str(layer_index + 1)], grads[
+            "dA" + str(layer_index)] = transform_activation_backward(
+            grads["dA" + str(layer_index + 1)],
             current_cache,
             activation)
-        print('dW' + str(l + 1), grads["dW" + str(l + 1)].shape)
-        print('db' + str(l + 1), grads["db" + str(l + 1)].shape)
-        print('dA' + str(l), grads["dA" + str(l)].shape)
+
+        print('dW' + str(layer_index + 1), grads["dW" + str(layer_index + 1)].shape)
+        print('db' + str(layer_index + 1), grads["db" + str(layer_index + 1)].shape)
+        print('dA' + str(layer_index), grads["dA" + str(layer_index)].shape)
 
     return grads
 
@@ -204,8 +256,6 @@ def update_parameters(parameters, grads, learning_rate):
     L = len(parameters) // 2  # number of layers in the neural network
 
     for l in range(L):
-        print(parameters["W" + str(l + 1)].shape)
-        print(grads["dW" + str(l + 1)].shape)
         parameters["W" + str(l + 1)] = parameters["W" + str(l + 1)] - learning_rate * grads["dW" + str(l + 1)]
         parameters["b" + str(l + 1)] = parameters["b" + str(l + 1)] - learning_rate * grads["db" + str(l + 1)]
 
@@ -216,19 +266,21 @@ def run():
     dim = [5, 4, 3, 1]
     X = np.random.randn(5, 4) * 0.01
     Y = np.ones((1, 4))
-    par = initializePramaters(dim)
+    par = initialize_parameters(dim)
     # for l in range(1, len(dim)):
     # print("W :", par["W" + str(l)].shape)
     # print("b :", par["b" + str(l)].shape)
     # print('***********************************')
-    AL, caches = forwardPord(X, par, "sigmoid")
+    AL, caches = forward_propagation(X, par, "sigmoid")
     # print('A :', A)
     cost = computeCost(AL, Y)
     # print("cost ", cost)
     # print("len of caches", len(caches))
 
-    grads = backward_prob(AL, Y, caches, "sigmoid")
-    update_parameters(par, grads, 0.01)
+    grads = backward_propagation(AL, Y, caches, "sigmoid")
+    par = update_parameters(par, grads, 0.01)
+
+    print('parameters length', len(par))
 
 
 def get_confusion_matrix(predicted, actual):
