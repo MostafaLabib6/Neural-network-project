@@ -15,7 +15,6 @@ def sigmoid(x):
         -->1 / (1 + np.exp(-x)) same shape as x
         sigmoid(-input)
     """
-
     return 1 / (1 + np.exp(-x))
 
 
@@ -28,7 +27,6 @@ def tanh(x):
         --> (1-e^(-x))/(1+e^(-x)) same shape as x
         tanh(-input)
     """
-
     return np.tanh(x)
 
 
@@ -41,7 +39,6 @@ def sigmoid_backward(dA, Z):
     returns
         -->dA * s * (1 - s)
     """
-
     s = sigmoid(Z)
 
     return dA * s * (1 - s)
@@ -56,7 +53,6 @@ def tanh_backward(dA, Z):
     returns
         -->dA * (1-tanh(Z)**2)
     """
-
     return dA * (1 - np.tanh(Z) ** 2)
 
 
@@ -82,7 +78,6 @@ def initialize_parameters(dim):
     b3=(1,1)
 
     """
-
     parameters = {}  # dictionary that contains our parameters
     L = len(dim)
 
@@ -108,7 +103,6 @@ def transform_activation_forward(A_prev, W, b, activation="sigmoid"):
         A :
         cache : that contains input , weights ,bias and Z for this layer
     """
-
     Z = W @ A_prev + b  # linear activation function
     if activation == "sigmoid":
         A = sigmoid(Z)
@@ -135,7 +129,6 @@ def forward_propagation(X, parameters, activation="sigmoid"):
 
 
     """
-
     L = len(parameters) // 2
     A = X
     caches = []
@@ -158,7 +151,6 @@ def computeCost(output_A, Y):
             --> cost : (-1 / m) * (Y @ np.log(output_A).T + (1 - Y) @ np.log(1 - output_A).T)
 
     """
-
     m = Y.shape[1]
     cost = (-1 / m) * (Y @ np.log(output_A).T + (1 - Y) @ np.log(1 - output_A).T)
     cost = np.squeeze(cost)  # to remove extra []
@@ -182,7 +174,6 @@ def transform_activation_backward(dA, cache, activation="sigmoid"):
         db : vector to update biases
         prev_A : new input for previous layer
     """
-
     A_prev, W, b, Z = cache
     m = A_prev.shape[1]
 
@@ -211,7 +202,6 @@ def backward_propagation(AL, Y, caches, activation="sigmoid"):
              grads["dW" + str(l)] = ...
              grads["db" + str(l)] = ...
     """
-
     grads = {}
     L = len(caches)
 
