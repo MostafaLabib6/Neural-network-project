@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import time
 from helper_functions import sigmoid, tanh, sigmoid_backward, tanh_backward
 
 np.random.seed(10)
@@ -27,13 +28,12 @@ def initialize_parameters(dim):
     b2=(2,1)
     W3=(1,2)
     b3=(1,1)
-
     """
     parameters = {}  # dictionary that contains our parameters
     L = len(dim)
 
     for layer_index in range(1, L):
-        parameters["W" + str(layer_index)] = np.random.randn(dim[layer_index], dim[layer_index - 1]) * 0.01
+        parameters["W" + str(layer_index)] = np.random.randn(dim[layer_index], dim[layer_index - 1])
         parameters["b" + str(layer_index)] = np.zeros((dim[layer_index], 1))
     #     print('W' + str(layer_index), parameters["W" + str(layer_index)].shape)
     #     print('b' + str(layer_index), parameters["b" + str(layer_index)].shape)
@@ -82,6 +82,7 @@ def forward_propagation(X, parameters, activation="sigmoid"):
     """
     L = len(parameters) // 2
     A = X
+
     caches = []
 
     for layer_index in range(1, L + 1):
@@ -189,7 +190,6 @@ def update_parameters(parameters, grads, learning_rate, bias=True):
     :return:
             --> update weights and biases
     """
-    print('bias value', bias)
     L = len(parameters) // 2  # number of layers in the neural network
     update = 1
     if bias is False:
@@ -199,8 +199,6 @@ def update_parameters(parameters, grads, learning_rate, bias=True):
             "dW" + str(layer_index + 1)]
         parameters["b" + str(layer_index + 1)] = parameters["b" + str(layer_index + 1)] - learning_rate * grads[
             "db" + str(layer_index + 1)] * update
-        print('----------------')
-        print(parameters["b" + str(layer_index + 1)])
 
     return parameters
 
@@ -219,38 +217,43 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
     :return:
         -->dictionary of learning parameters
     """
+    start = time.time()
     parameters = initialize_parameters(dims)
+    X = pd.DataFrame(X)
     for i in range(0, epochs):
         # Forward propagation: [LINEAR --> SIGMOID].
-        AL, caches = forward_propagation(X, parameters, activation)
+        for index, x in X.T.reset_index(drop=True).iterrows():
+            x = x.to_numpy().reshape((-1, 1))
 
-        cost = compute_cost(AL, Y)
+            AL, caches = forward_propagation(x, parameters, activation)
 
-        # Backward propagation.
-        grads = backward_propagation(AL, Y, caches, activation)
+            # cost = compute_cost(AL, Y)
 
-        # Update parameters.
-        parameters = update_parameters(parameters, grads, learning_rate, bias)
+            # Backward propagation.
+            grads = backward_propagation(AL, Y[index], caches, activation)
 
-        if print_cost and i % 100 == 0:
-            print("Cost after iteration %i: %f" % (i, cost))
+            # Update parameters.
+            parameters = update_parameters(parameters, grads, learning_rate, bias)
 
+        # if print_cost and i % 100 == 0:
+        #     print("Cost after iteration %i: %f" % (i, cost))
+    print('Traing time', time.time() - start)
     return parameters
 
 
 def run():
     data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
     X = np.array(data.drop('label', axis=1).T)
+    X = X.astype('float32') / 255
+
     Y = np.array(data['label'])
     Y = Y.reshape((-1, 1))
-    Y = Y.T
+    Y = Y
 
-    print(X.dtype)
-    print(Y.dtype)
-    dim = [X.shape[0], 4, 3, 1]
+    dim = [X.shape[0], 512, 256, 124, 10]
+    # 512, 256, 124, 10
 
-    par = model(X, Y, dim, 0.01, True, 'sigmoid', 10, True)
-    print('parameters length', len(par))
+    par = model(X, Y, dim, 0.1, True, 'sigmoid', 5, True)
     predict(X, par, Y, 'sigmoid')
 
 
@@ -313,19 +316,21 @@ def predict(X, parameters, actual, activation):
     :return:
             --> model accuracy :)
     """
+    start = time.time()
     acc = 0
     predicted, _ = forward_propagation(X, parameters, activation)
     predicted = pd.DataFrame(predicted)
-    predicted = predicted[1].apply(sigmoid)
-    predicted = predicted.reset_index(drop=True)
+    predicted = predicted.reset_index(drop=True)  # 10000,10
     for index in range(X.shape[1]):
-        print(actual[index], predicted[index])
-        print(actual.shape)
-        print(actual[0, 0])
-        if actual[1, index] == predicted[index]:
+        max_index = np.argmax(predicted[index])
+        print(max_index)
+        print(actual[index][0])
+        if actual[index][0] == max_index:
             acc = acc + 1
-
-    return (acc / X.shape[0]) * 100, get_confusion_matrix(predicted=predicted, actual=actual)
+    print(acc)
+    print('acc :', acc / X.shape[1])
+    print('prediction time', time.time() - start)
+    return (acc / X.shape[0]) * 100  # get_confusion_matrix(predicted=predicted, actual=actual)
 
 
 run()
