@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import helper_functions as helper
+from helper_functions import sigmoid, tanh, sigmoid_backward, tanh_backward
 
 np.random.seed(10)
 
@@ -56,9 +56,9 @@ def transform_activation_forward(A_prev, W, b, activation="sigmoid"):
     """
     Z = W @ A_prev + b  # linear activation function
     if activation == "sigmoid":
-        A = helper.sigmoid(Z)
+        A = sigmoid(Z)
     elif activation == "tanh":
-        A = helper.tanh(Z)
+        A = tanh(Z)
     else:
         raise Exception("Please Enter activation function ")
 
@@ -129,9 +129,9 @@ def transform_activation_backward(dA, cache, activation="sigmoid"):
     m = A_prev.shape[1]
 
     if activation == "sigmoid":
-        dZ = helper.sigmoid_backward(dA, Z)
+        dZ = sigmoid_backward(dA, Z)
     else:
-        dZ = helper.tanh_backward(dA, Z)
+        dZ = tanh_backward(dA, Z)
 
     dW = (1 / m) * (dZ @ A_prev.T)  # where is dZ is previous roo * derivative of sigmoid
     db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)  # keep output dims as input dims
@@ -239,11 +239,19 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
 
 
 def run():
-    dim = [5, 4, 3, 1]
-    X = np.random.randn(5, 4) * 0.01
-    Y = np.ones((1, 4))
-    par = model(X, Y, dim, 0.01, True, 'sigmoid', 1000, True)
+    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
+    X = np.array(data.drop('label', axis=1).T)
+    Y = np.array(data['label'])
+    Y = Y.reshape((-1, 1))
+    Y = Y.T
+
+    print(X.dtype)
+    print(Y.dtype)
+    dim = [X.shape[0], 4, 3, 1]
+
+    par = model(X, Y, dim, 0.01, True, 'sigmoid', 10, True)
     print('parameters length', len(par))
+    predict(X, par, Y, 'sigmoid')
 
 
 def get_confusion_matrix(predicted, actual):
@@ -271,6 +279,7 @@ def get_confusion_matrix(predicted, actual):
             if predicted[i] == actual[i]:
                 tn = tn + 1
             else:
+
                 fn = fn + 1
 
     confusion_matrix = np.zeros((2, 2))
@@ -296,22 +305,24 @@ def plots(X):
     plt.show()
 
 
-def predict(X, w, b, actual):
+def predict(X, parameters, actual, activation):
     """
     :param X: input vector of size (2,m)
-    :param w: weighted vector
-    :param b: scaler ,bias
+    :param
     :param actual: Actual value Vector
     :return:
             --> model accuracy :)
     """
     acc = 0
-    predicted = X @ w + b
+    predicted, _ = forward_propagation(X, parameters, activation)
     predicted = pd.DataFrame(predicted)
-    predicted = predicted[0].apply(helper.sigmoid)
+    predicted = predicted[1].apply(sigmoid)
     predicted = predicted.reset_index(drop=True)
-    for index in range(X.shape[0]):
-        if actual[index] == predicted[index]:
+    for index in range(X.shape[1]):
+        print(actual[index], predicted[index])
+        print(actual.shape)
+        print(actual[0, 0])
+        if actual[1, index] == predicted[index]:
             acc = acc + 1
 
     return (acc / X.shape[0]) * 100, get_confusion_matrix(predicted=predicted, actual=actual)
