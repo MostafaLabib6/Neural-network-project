@@ -84,9 +84,9 @@ def initialize_parameters(dim):
     for layer_index in range(1, L):
         parameters["W" + str(layer_index)] = np.random.randn(dim[layer_index], dim[layer_index - 1]) * 0.01
         parameters["b" + str(layer_index)] = np.zeros((dim[layer_index], 1))
-        print('W' + str(layer_index), parameters["W" + str(layer_index)].shape)
-        print('b' + str(layer_index), parameters["b" + str(layer_index)].shape)
-    print('--------------------------------')
+    #     print('W' + str(layer_index), parameters["W" + str(layer_index)].shape)
+    #     print('b' + str(layer_index), parameters["b" + str(layer_index)].shape)
+    # print('--------------------------------')
     return parameters
 
 
@@ -142,7 +142,7 @@ def forward_propagation(X, parameters, activation="sigmoid"):
     return A, caches
 
 
-def computeCost(output_A, Y):
+def compute_cost(output_A, Y):
     """
     compute between actual vector and predicted vector
     :param output_A: probability vector for output layer
@@ -221,33 +221,65 @@ def backward_propagation(AL, Y, caches, activation="sigmoid"):
             current_cache,
             activation)
 
-        print('dW' + str(layer_index + 1), grads["dW" + str(layer_index + 1)].shape)
-        print('db' + str(layer_index + 1), grads["db" + str(layer_index + 1)].shape)
-        print('dA' + str(layer_index), grads["dA" + str(layer_index)].shape)
+        # print('dW' + str(layer_index + 1), grads["dW" + str(layer_index + 1)].shape)
+        # print('db' + str(layer_index + 1), grads["db" + str(layer_index + 1)].shape)
+        # print('dA' + str(layer_index), grads["dA" + str(layer_index)].shape)
 
     return grads
 
 
-def update_parameters(parameters, grads, learning_rate):
+def update_parameters(parameters, grads, learning_rate, bias=True):
     """
 
-    :param w: weights, array
-    :param b: bias
-    :param X: input vector of size (2,m)
-    :param Y: Actual value Vector
-    :param numIter: epochs
-    :param learning_rate: step size
-    :param print_cost: flag to print cost
-    :param withBias: flag to use bias
+    :param parameters: dictionary that contains our initialized weights and biases
+    :param grads: dictionary of dw ,db,dA
+    :param learning_rate: (value) step size
+    :param bias: (flag) to use bias or not
     :return:
-            --> learned weights
-            --> cost vector values
+            --> update weights and biases
     """
     L = len(parameters) // 2  # number of layers in the neural network
+    update = 1
+    if bias is False:
+        update = 0
+    for layer_index in range(L):
+        parameters["W" + str(layer_index + 1)] = parameters["W" + str(layer_index + 1)] - learning_rate * grads[
+            "dW" + str(layer_index + 1)]
+        parameters["b" + str(layer_index + 1)] = parameters["b" + str(layer_index + 1)] - learning_rate * grads[
+            "db" + str(layer_index + 1)] * update
 
-    for l in range(L):
-        parameters["W" + str(l + 1)] = parameters["W" + str(l + 1)] - learning_rate * grads["dW" + str(l + 1)]
-        parameters["b" + str(l + 1)] = parameters["b" + str(l + 1)] - learning_rate * grads["db" + str(l + 1)]
+    return parameters
+
+
+def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epochs=1000, print_cost=False):
+    """
+
+    :param X: input data
+    :param Y: label data
+    :param dim: (list of neurons) each element in this list refer to neurons in layer
+    :param learning_rate: step size
+    :param bias: flag to use bias or not
+    :param activation: activation function to be used
+    :param epochs: number of iterations
+    :param print_cost:  flag for printing cost after number of iterations
+    :return:
+        -->dictionary of learning parameters
+    """
+    parameters = initialize_parameters(dims)
+    for i in range(0, epochs):
+        # Forward propagation: [LINEAR --> SIGMOID].
+        AL, caches = forward_propagation(X, parameters, activation)
+
+        cost = compute_cost(AL, Y)
+
+        # Backward propagation.
+        grads = backward_propagation(AL, Y, caches, activation)
+
+        # Update parameters.
+        parameters = update_parameters(parameters, grads, learning_rate, False)
+
+        if print_cost and i % 100 == 0:
+            print("Cost after iteration %i: %f" % (i, cost))
 
     return parameters
 
@@ -256,20 +288,7 @@ def run():
     dim = [5, 4, 3, 1]
     X = np.random.randn(5, 4) * 0.01
     Y = np.ones((1, 4))
-    par = initialize_parameters(dim)
-    # for l in range(1, len(dim)):
-    # print("W :", par["W" + str(l)].shape)
-    # print("b :", par["b" + str(l)].shape)
-    # print('***********************************')
-    AL, caches = forward_propagation(X, par, "sigmoid")
-    # print('A :', A)
-    cost = computeCost(AL, Y)
-    # print("cost ", cost)
-    # print("len of caches", len(caches))
-
-    grads = backward_propagation(AL, Y, caches, "sigmoid")
-    par = update_parameters(par, grads, 0.01)
-
+    par = model(X, Y, dim, 0.01, True, 'sigmoid', 1000, True)
     print('parameters length', len(par))
 
 
@@ -310,7 +329,6 @@ def get_confusion_matrix(predicted, actual):
 
 def plots(X):
     """
-
     :param X:  input vector of size (2,m)
     :return:
             --> 10 plots between features (f1,f2)..elc
@@ -326,7 +344,6 @@ def plots(X):
 
 def predict(X, w, b, actual):
     """
-
     :param X: input vector of size (2,m)
     :param w: weighted vector
     :param b: scaler ,bias
