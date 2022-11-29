@@ -2,58 +2,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import helper_functions as helper
 
 np.random.seed(10)
-
-
-def sigmoid(x):
-    """
-    compute signum of x
-    param x : ndarray vector
-
-    returns
-        -->1 / (1 + np.exp(-x)) same shape as x
-        sigmoid(-input)
-    """
-    return 1 / (1 + np.exp(-x))
-
-
-def tanh(x):
-    """
-    compute tanh of input vector
-    param x : ndarray vector
-
-    returns
-        --> (1-e^(-x))/(1+e^(-x)) same shape as x
-        tanh(-input)
-    """
-    return np.tanh(x)
-
-
-def sigmoid_backward(dA, Z):
-    """
-    compute (sigmoid derivative  of input vector)*previous sigma
-    param Z: ndarray vector
-    param dA : previous roo
-
-    returns
-        -->dA * s * (1 - s)
-    """
-    s = sigmoid(Z)
-
-    return dA * s * (1 - s)
-
-
-def tanh_backward(dA, Z):
-    """
-    compute (tanh derivative  of input vector)*previous sigma
-    param Z: ndarray vector
-    param dA : previous roo
-
-    returns
-        -->dA * (1-tanh(Z)**2)
-    """
-    return dA * (1 - np.tanh(Z) ** 2)
 
 
 def initialize_parameters(dim):
@@ -105,9 +56,9 @@ def transform_activation_forward(A_prev, W, b, activation="sigmoid"):
     """
     Z = W @ A_prev + b  # linear activation function
     if activation == "sigmoid":
-        A = sigmoid(Z)
+        A = helper.sigmoid(Z)
     elif activation == "tanh":
-        A = tanh(Z)
+        A = helper.tanh(Z)
     else:
         raise Exception("Please Enter activation function ")
 
@@ -178,9 +129,9 @@ def transform_activation_backward(dA, cache, activation="sigmoid"):
     m = A_prev.shape[1]
 
     if activation == "sigmoid":
-        dZ = sigmoid_backward(dA, Z)
+        dZ = helper.sigmoid_backward(dA, Z)
     else:
-        dZ = tanh_backward(dA, Z)
+        dZ = helper.tanh_backward(dA, Z)
 
     dW = (1 / m) * (dZ @ A_prev.T)  # where is dZ is previous roo * derivative of sigmoid
     db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)  # keep output dims as input dims
@@ -238,6 +189,7 @@ def update_parameters(parameters, grads, learning_rate, bias=True):
     :return:
             --> update weights and biases
     """
+    print('bias value', bias)
     L = len(parameters) // 2  # number of layers in the neural network
     update = 1
     if bias is False:
@@ -247,6 +199,8 @@ def update_parameters(parameters, grads, learning_rate, bias=True):
             "dW" + str(layer_index + 1)]
         parameters["b" + str(layer_index + 1)] = parameters["b" + str(layer_index + 1)] - learning_rate * grads[
             "db" + str(layer_index + 1)] * update
+        print('----------------')
+        print(parameters["b" + str(layer_index + 1)])
 
     return parameters
 
@@ -276,7 +230,7 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
         grads = backward_propagation(AL, Y, caches, activation)
 
         # Update parameters.
-        parameters = update_parameters(parameters, grads, learning_rate, False)
+        parameters = update_parameters(parameters, grads, learning_rate, bias)
 
         if print_cost and i % 100 == 0:
             print("Cost after iteration %i: %f" % (i, cost))
@@ -354,7 +308,7 @@ def predict(X, w, b, actual):
     acc = 0
     predicted = X @ w + b
     predicted = pd.DataFrame(predicted)
-    predicted = predicted[0].apply(sigmoid)
+    predicted = predicted[0].apply(helper.sigmoid)
     predicted = predicted.reset_index(drop=True)
     for index in range(X.shape[0]):
         if actual[index] == predicted[index]:
