@@ -134,8 +134,8 @@ def transform_activation_backward(dA, cache, activation="sigmoid"):
     else:
         dZ = tanh_backward(dA, Z)
 
-    dW = (1 / m) * (dZ @ A_prev.T)  # where is dZ is previous roo * derivative of sigmoid
-    db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)  # keep output dims as input dims
+    dW = (dZ @ A_prev.T)  # where is dZ is previous roo * derivative of sigmoid
+    db = np.sum(dZ, axis=1, keepdims=True)  # keep output dims as input dims
     dA_prev = W.T @ dZ
 
     return dW, db, dA_prev
@@ -208,7 +208,7 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
 
     :param X: input data
     :param Y: label data
-    :param dim: (list of neurons) each element in this list refer to neurons in layer
+    :param dims: (list of neurons) each element in this list refer to neurons in layer
     :param learning_rate: step size
     :param bias: flag to use bias or not
     :param activation: activation function to be used
@@ -237,12 +237,12 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
 
         # if print_cost and i % 100 == 0:
         #     print("Cost after iteration %i: %f" % (i, cost))
-    print('Traing time', time.time() - start)
+    print('training time', time.time() - start)
     return parameters
 
 
 def run():
-    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
+    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
     X = np.array(data.drop('label', axis=1).T)
     X = X.astype('float32') / 255
 
@@ -250,10 +250,10 @@ def run():
     Y = Y.reshape((-1, 1))
     Y = Y
 
-    dim = [X.shape[0], 512, 256, 124, 10]
+    dim = [X.shape[0], 124, 10]
     # 512, 256, 124, 10
 
-    par = model(X, Y, dim, 0.1, True, 'sigmoid', 5, True)
+    par = model(X, Y, dim, 0.01, True, 'sigmoid', 30, True)
     predict(X, par, Y, 'sigmoid')
 
 
@@ -311,8 +311,10 @@ def plots(X):
 def predict(X, parameters, actual, activation):
     """
     :param X: input vector of size (2,m)
-    :param
+    :param parameters : learned weights and biases
     :param actual: Actual value Vector
+    :param activation: activation function
+
     :return:
             --> model accuracy :)
     """
@@ -322,9 +324,10 @@ def predict(X, parameters, actual, activation):
     predicted = pd.DataFrame(predicted)
     predicted = predicted.reset_index(drop=True)  # 10000,10
     for index in range(X.shape[1]):
+        print(index)
+        print('---------')
         max_index = np.argmax(predicted[index])
-        print(max_index)
-        print(actual[index][0])
+        print(actual[index][0], max_index, np.max(predicted[index][0]))
         if actual[index][0] == max_index:
             acc = acc + 1
     print(acc)
