@@ -250,9 +250,9 @@ def run():
     Y = Y.reshape((-1, 1))
     Y = Y
 
-    dim = [X.shape[0],32,16,8, 10]
+    dim = [X.shape[0], 32, 16, 10]
     # 512, 256, 124, 10
-    par = model(X, Y, dim, 0.01, True, 'tanh', 300, True)
+    par = model(X, Y, dim, 0.01, True, 'tanh', 500, True)
     predict(X, par, Y, 'tanh')
 
 
