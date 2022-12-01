@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -242,7 +244,7 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
 
 
 def run():
-    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
+    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
     X = np.array(data.drop('label', axis=1).T)
     X = X.astype('float32') / 255
 
@@ -253,7 +255,18 @@ def run():
     dim = [X.shape[0], 32, 16, 10]
     # 512, 256, 124, 10
     par = model(X, Y, dim, 0.01, True, 'tanh', 500, True)
-    predict(X, par, Y, 'tanh')
+
+    with open('parameters.pickle', 'wb') as handle:
+        pickle.dump(par, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    datat = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
+    Xt = np.array(datat.drop('label', axis=1).T)
+    Xt = Xt.astype('float32') / 255
+
+    Yt = np.array(datat['label'])
+    Yt = Yt.reshape((-1, 1))
+
+    predict(Xt, par, Yt, 'tanh')
 
 
 def get_confusion_matrix(predicted, actual):
