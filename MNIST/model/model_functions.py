@@ -156,7 +156,6 @@ def backward_propagation(AL, Y, caches, activation="sigmoid"):
     """
     grads = {}
     L = len(caches)
-
     dAL = np.subtract(Y, AL)
 
     current_cache = caches[L - 1]
@@ -195,9 +194,9 @@ def update_parameters(parameters, grads, learning_rate, bias=True):
     if bias is False:
         update = 0
     for layer_index in range(L):
-        parameters["W" + str(layer_index + 1)] = parameters["W" + str(layer_index + 1)] - learning_rate * grads[
+        parameters["W" + str(layer_index + 1)] = parameters["W" + str(layer_index + 1)] + learning_rate * grads[
             "dW" + str(layer_index + 1)]
-        parameters["b" + str(layer_index + 1)] = parameters["b" + str(layer_index + 1)] - learning_rate * grads[
+        parameters["b" + str(layer_index + 1)] = parameters["b" + str(layer_index + 1)] + learning_rate * grads[
             "db" + str(layer_index + 1)] * update
 
     return parameters
@@ -230,8 +229,9 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
             # cost = compute_cost(AL, Y)
 
             # Backward propagation.
-            grads = backward_propagation(AL, Y[index], caches, activation)
-
+            y = np.zeros((10, 1))
+            y[Y[index]] = 1
+            grads = backward_propagation(AL, y, caches, activation)
             # Update parameters.
             parameters = update_parameters(parameters, grads, learning_rate, bias)
 
@@ -242,7 +242,7 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
 
 
 def run():
-    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
+    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
     X = np.array(data.drop('label', axis=1).T)
     X = X.astype('float32') / 255
 
@@ -250,11 +250,10 @@ def run():
     Y = Y.reshape((-1, 1))
     Y = Y
 
-    dim = [X.shape[0], 124, 10]
+    dim = [X.shape[0],32,16,8, 10]
     # 512, 256, 124, 10
-
-    par = model(X, Y, dim, 0.01, True, 'sigmoid', 30, True)
-    predict(X, par, Y, 'sigmoid')
+    par = model(X, Y, dim, 0.01, True, 'tanh', 300, True)
+    predict(X, par, Y, 'tanh')
 
 
 def get_confusion_matrix(predicted, actual):
