@@ -216,6 +216,7 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
     X = pd.DataFrame(X)
     for i in range(0, epochs):
         # Forward propagation: [LINEAR --> SIGMOID].
+        print('Epoch : ', i)
         for index, x in X.T.reset_index(drop=True).iterrows():
             x = x.to_numpy().reshape((-1, 1))
 
@@ -236,32 +237,6 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
     return parameters
 
 
-def run():
-    data = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
-    X = np.array(data.drop('label', axis=1).T)
-    X = X.astype('float32') / 255
-
-    Y = np.array(data['label'])
-    Y = Y.reshape((-1, 1))
-    Y = Y
-
-    dim = [X.shape[0], 32, 16, 10]
-    # 512, 256, 124, 10
-    par = model(X, Y, dim, 0.01, True, 'sigmoid', 20, True)
-
-    # with open('parameters.pickle', 'wb') as handle:
-    #     pickle.dump(par, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    datat = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
-    Xt = np.array(datat.drop('label', axis=1).T)
-    Xt = Xt.astype('float32') / 255
-
-    Yt = np.array(datat['label'])
-    Yt = Yt.reshape((-1, 1))
-
-    predict(Xt, par, Yt, 'sigmoid')
-
-
 def get_confusion_matrix(predicted, actual):
     """
     Assumes "1" is the positive class
@@ -274,27 +249,19 @@ def get_confusion_matrix(predicted, actual):
                     -----------------------
     Predicted = 0       FN     | TN
     """
-    tp, fp, tn, fn = (0, 0, 0, 0)
-    predicted = predicted.to_numpy()
-    # actual = actual.to_numpy()
-    for i in range(len(predicted)):
-        if predicted[i] == 1:
-            if predicted[i] == actual[i]:
-                tp = tp + 1
-            else:
-                fp = fp + 1
-        else:
-            if predicted[i] == actual[i]:
-                tn = tn + 1
-            else:
 
-                fn = fn + 1
+    confusion_matrix = np.zeros((10, 10))
 
-    confusion_matrix = np.zeros((2, 2))
-    confusion_matrix[0, 0] = tp
-    confusion_matrix[0, 1] = fp
-    confusion_matrix[1, 0] = fn
-    confusion_matrix[1, 1] = tn
+    for index in range(predicted.shape[1]):
+        max_index = np.argmax(predicted[index])
+        for i in range(10):
+            for j in range(10):
+                if max_index == i:
+                    if actual[index] == max_index:
+                        confusion_matrix[i][i] = confusion_matrix[i][i] + 1
+                    else:
+                        confusion_matrix[i][actual[index]] = confusion_matrix[i][actual[index]] + 1
+
     return confusion_matrix
 
 
@@ -335,5 +302,4 @@ def predict(X, parameters, actual, activation):
     print('Accuracy : ', accuracy)
     print('Accuracy :', (accuracy / X.shape[1]) * 100)
     print('prediction time', time.time() - start)
-    return (accuracy / X.shape[0]) * 100  # get_confusion_matrix(predicted=predicted, actual=actual)
-
+    return (accuracy / X.shape[1]) * 100, get_confusion_matrix(predicted=predicted, actual=actual)

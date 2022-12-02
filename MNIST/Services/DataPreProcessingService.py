@@ -1,20 +1,19 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 
 
 class DataPreProcessingService:
     def __init__(self):
         self.train_data = pd.read_csv(
-            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
+            'mnist-in-csv\mnist_train.csv')
         self.test_data = pd.read_csv(
-            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
+            'mnist-in-csv\mnist_test.csv')
 
     def reset(self):
         self.train_data = pd.read_csv(
-            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
+            'mnist-in-csv\mnist_train.csv')
         self.test_data = pd.read_csv(
-            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
+            'mnist-in-csv\mnist_test.csv')
 
     def Shared_preprocessing_train(self):
         np.random.seed(10)

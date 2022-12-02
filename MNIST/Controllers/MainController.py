@@ -7,8 +7,6 @@ np.random.seed(10)
 
 
 class MainController:
-
-    # instance attributes
     def __init__(self):
         self.service = dpp.DataPreProcessingService()
         self.X_train, self.Y_train = self.service.Shared_preprocessing_train()
@@ -28,11 +26,11 @@ class MainController:
 
     def test_model(self, activation='sigmoid'):
         accuracy, Cmatrx = helper.predict(self.X_test, self.parameteres, self.Y_test, activation=activation)
-        fig, ax = plt.subplots(figsize=(6, 5))
+        fig, ax = plt.subplots(figsize=(20, 20))
         ax.matshow(Cmatrx, cmap=plt.cm.Blues, alpha=0.3)
         for i in range(Cmatrx.shape[0]):
             for j in range(Cmatrx.shape[1]):
-                ax.text(x=j, y=i, s=Cmatrx[i, j], va='center', ha='center', size='xx-large')
+                ax.text(x=j, y=i, s=Cmatrx[i, j], va='center', ha='center', size='x-large')
 
         plt.xlabel('Prediction', fontsize=18)
         plt.ylabel('Actual', fontsize=18)

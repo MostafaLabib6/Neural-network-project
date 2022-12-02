@@ -16,7 +16,7 @@ class GUI:
         self.accuarcyEntry.configure(state='normal')
         self.accuarcyEntry.delete(0, END)
         self.accuarcyEntry.insert(0, str(acc))
-        self.accuarcyEntry.configure(state='disable')
+        self.accuarcyEntry.configure(state='disabled')
 
     def getEpochs(self):
         try:
@@ -37,9 +37,10 @@ class GUI:
     def train(self):
         self.controller.reset()
         if self.select_activationFn.get() and self.neurons.get():
-            acc = self.controller.train_model(dims=self.get_neurons(), learning_rate=self.getLearningRate(),
-                                              bias=self.getBais(), activation=self.select_activationFn.get())
-            self.controller.test_model(self.select_activationFn.get())
+            self.controller.train_model(dims=self.get_neurons(), learning_rate=self.getLearningRate(),
+                                        bias=self.getBais(), activation=self.select_activationFn.get(),
+                                        epochs=self.getEpochs())
+            acc = self.controller.test_model(self.select_activationFn.get())
             self.setAccuracy(acc)
 
     def drowing_plots(self):
