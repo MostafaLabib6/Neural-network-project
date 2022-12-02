@@ -1,11 +1,10 @@
 import pickle
-
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import time
-from helper_functions import sigmoid, tanh, sigmoid_backward, tanh_backward
+from model.helper_functions import sigmoid, tanh, sigmoid_backward, tanh_backward
 
 np.random.seed(10)
 
@@ -37,13 +36,10 @@ def initialize_parameters(dim):
     for layer_index in range(1, L):
         parameters["W" + str(layer_index)] = np.random.randn(dim[layer_index], dim[layer_index - 1])
         parameters["b" + str(layer_index)] = np.zeros((dim[layer_index], 1))
-    #     print('W' + str(layer_index), parameters["W" + str(layer_index)].shape)
-    #     print('b' + str(layer_index), parameters["b" + str(layer_index)].shape)
-    # print('--------------------------------')
     return parameters
 
 
-def transform_activation_forward(A_prev, W, b, activation="sigmoid"):
+def transform_activation_forward(A_prev, W, b, activation="Sigmoid"):
     """
     compute sigmoid | tanh for linear activation function
     param A_prev: input for hidden layer
@@ -57,9 +53,9 @@ def transform_activation_forward(A_prev, W, b, activation="sigmoid"):
         cache : that contains input , weights ,bias and Z for this layer
     """
     Z = W @ A_prev + b  # linear activation function
-    if activation == "sigmoid":
+    if activation == "Sigmoid":
         A = sigmoid(Z)
-    elif activation == "tanh":
+    elif activation == "Tanh":
         A = tanh(Z)
     else:
         raise Exception("Please Enter activation function ")
@@ -69,7 +65,7 @@ def transform_activation_forward(A_prev, W, b, activation="sigmoid"):
     return A, cache
 
 
-def forward_propagation(X, parameters, activation="sigmoid"):
+def forward_propagation(X, parameters, activation="Sigmoid"):
     """
     implement forward propagation -->LOOP ( linear-->Activation )
 
@@ -112,7 +108,7 @@ def compute_cost(output_A, Y):
     return cost
 
 
-def transform_activation_backward(dA, cache, activation="sigmoid"):
+def transform_activation_backward(dA, cache, activation="Sigmoid"):
     """
     compute dW :Gradiant of cost relative for W
     ,dB : derivation of cost relative for bias
@@ -131,7 +127,7 @@ def transform_activation_backward(dA, cache, activation="sigmoid"):
     A_prev, W, b, Z = cache
     m = A_prev.shape[1]
 
-    if activation == "sigmoid":
+    if activation == "Sigmoid":
         dZ = sigmoid_backward(dA, Z)
     else:
         dZ = tanh_backward(dA, Z)
@@ -143,7 +139,7 @@ def transform_activation_backward(dA, cache, activation="sigmoid"):
     return dW, db, dA_prev
 
 
-def backward_propagation(AL, Y, caches, activation="sigmoid"):
+def backward_propagation(AL, Y, caches, activation="Sigmoid"):
     """
 
     :param AL: predicated vector
@@ -174,10 +170,6 @@ def backward_propagation(AL, Y, caches, activation="sigmoid"):
             current_cache,
             activation)
 
-        # print('dW' + str(layer_index + 1), grads["dW" + str(layer_index + 1)].shape)
-        # print('db' + str(layer_index + 1), grads["db" + str(layer_index + 1)].shape)
-        # print('dA' + str(layer_index), grads["dA" + str(layer_index)].shape)
-
     return grads
 
 
@@ -207,17 +199,18 @@ def update_parameters(parameters, grads, learning_rate, bias=True):
 def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epochs=1000, print_cost=False):
     """
 
-    :param X: input data
-    :param Y: label data
-    :param dims: (list of neurons) each element in this list refer to neurons in layer
-    :param learning_rate: step size
-    :param bias: flag to use bias or not
-    :param activation: activation function to be used
-    :param epochs: number of iterations
-    :param print_cost:  flag for printing cost after number of iterations
+    :param X: input data.
+    :param Y: label data.
+    :param dims: (list of neurons) each element in this list refer to neurons in layer.
+    :param learning_rate: step size.
+    :param bias: flag to use bias or not.
+    :param activation: activation function to be used.
+    :param epochs: number of iterations.
+    :param print_cost:  flag for printing cost after number of iterations.
     :return:
         -->dictionary of learning parameters
     """
+
     start = time.time()
     parameters = initialize_parameters(dims)
     X = pd.DataFrame(X)
@@ -254,10 +247,10 @@ def run():
 
     dim = [X.shape[0], 32, 16, 10]
     # 512, 256, 124, 10
-    par = model(X, Y, dim, 0.01, True, 'tanh', 500, True)
+    par = model(X, Y, dim, 0.01, True, 'sigmoid', 20, True)
 
-    with open('parameters.pickle', 'wb') as handle:
-        pickle.dump(par, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('parameters.pickle', 'wb') as handle:
+    #     pickle.dump(par, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     datat = pd.read_csv(r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
     Xt = np.array(datat.drop('label', axis=1).T)
@@ -266,7 +259,7 @@ def run():
     Yt = np.array(datat['label'])
     Yt = Yt.reshape((-1, 1))
 
-    predict(Xt, par, Yt, 'tanh')
+    predict(Xt, par, Yt, 'sigmoid')
 
 
 def get_confusion_matrix(predicted, actual):
@@ -311,7 +304,7 @@ def plots(X):
     :return:
             --> 10 plots between features (f1,f2)..elc
     """
-    columns = ['flipper_length_mm', 'bill_depth_mm', 'bill_length_mm', 'gender', 'body_mass_g']
+    columns = []
     res = [(a, b) for idx, a in enumerate(columns) for b in columns[idx + 1:]]
     for i in res:
         plt.figure()
@@ -322,30 +315,25 @@ def plots(X):
 
 def predict(X, parameters, actual, activation):
     """
-    :param X: input vector of size (2,m)
-    :param parameters : learned weights and biases
-    :param actual: Actual value Vector
-    :param activation: activation function
+    :param X: input vector of size (2,m);
+    :param parameters : learned weights and biases.
+    :param actual: Actual value Vector.
+    :param activation: activation function.
 
     :return:
             --> model accuracy :)
     """
     start = time.time()
-    acc = 0
+    accuracy = 0
     predicted, _ = forward_propagation(X, parameters, activation)
     predicted = pd.DataFrame(predicted)
     predicted = predicted.reset_index(drop=True)  # 10000,10
     for index in range(X.shape[1]):
-        print(index)
-        print('---------')
         max_index = np.argmax(predicted[index])
-        print(actual[index][0], max_index, np.max(predicted[index][0]))
         if actual[index][0] == max_index:
-            acc = acc + 1
-    print(acc)
-    print('acc :', acc / X.shape[1])
+            accuracy = accuracy + 1
+    print('Accuracy : ', accuracy)
+    print('Accuracy :', (accuracy / X.shape[1]) * 100)
     print('prediction time', time.time() - start)
-    return (acc / X.shape[0]) * 100  # get_confusion_matrix(predicted=predicted, actual=actual)
+    return (accuracy / X.shape[0]) * 100  # get_confusion_matrix(predicted=predicted, actual=actual)
 
-
-run()

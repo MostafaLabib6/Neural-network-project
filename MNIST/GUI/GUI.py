@@ -29,14 +29,17 @@ class GUI:
         checkedOrNot = self.cbVariable.get()
         return checkedOrNot
 
+    def get_neurons(self):
+        neurons_list = self.neurons.get().split(',')
+        neurons_list = [int(i) for i in neurons_list]
+        return neurons_list
+
     def train(self):
         self.controller.reset()
-        if self.select_activationFn.get() and self.selected_class1.get() and self.selected_class2.get() and self.selected_feature2.get():
-            self.controller.filter_byClass(class1=self.selected_class1.get(), class2=self.selected_class2.get())
-            self.controller.filter_byFeature(feat1=self.select_activationFn.get(), feat2=self.selected_feature2.get())
-            acc = self.controller.trainModel(learning_rate=float(self.getLearningRate()), bais=self.getBais(),
-                                             epochs=int(self.getEpochs()))
-            self.controller.testModel(self.getBais())
+        if self.select_activationFn.get() and self.neurons.get():
+            acc = self.controller.train_model(dims=self.get_neurons(), learning_rate=self.getLearningRate(),
+                                              bias=self.getBais(), activation=self.select_activationFn.get())
+            self.controller.test_model(self.select_activationFn.get())
             self.setAccuracy(acc)
 
     def drowing_plots(self):

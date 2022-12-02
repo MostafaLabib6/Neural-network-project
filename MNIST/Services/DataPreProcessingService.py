@@ -5,56 +5,31 @@ from sklearn.preprocessing import StandardScaler
 
 class DataPreProcessingService:
     def __init__(self):
-        self.data = pd.read_csv('penguins.csv')
+        self.train_data = pd.read_csv(
+            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
+        self.test_data = pd.read_csv(
+            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
 
     def reset(self):
-        self.data = pd.read_csv('penguins.csv')
+        self.train_data = pd.read_csv(
+            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_train.csv')
+        self.test_data = pd.read_csv(
+            r'C:\Users\DELL\Documents\GitHub\Preceptron-Signum\MNIST\mnist-in-csv\mnist_test.csv')
 
-    def classFilter(self, class1, class2):
-        if class1 == "Adelie" and class2 == "Gentoo":
-            self.data = self.data.iloc[:100, :]
-        if class1 == "Adelie" and class2 == "Chinstrap":
-            self.data = self.data.iloc[np.r_[:50, 100:150], :]
-        if class1 == "Gentoo" and class2 == "Chinstrap":
-            self.data = self.data.iloc[50:, :]
-        if class1 == "Gentoo" and class2 == "Adelie":
-            self.data = self.data.iloc[:100, :]
-        if class1 == "Chinstrap" and class2 == "Adelie":
-            self.data = self.data.iloc[np.r_[:50, 100:150], :]
-        if class1 == "Chinstrap" and class2 == "Gentoo":
-            self.data = self.data.iloc[50:, :]
-        self.data['species'] = np.where(self.data['species'] == str(class1), 1, -1)
-
-        return self.data
-
-    def FeatureFilter(self, feat1: str, feat2: str):
-        self.data = self.data
-        class1Data = self.data[:50]
-        class2Data = self.data[50:100]
-        trainclass1 = class1Data[:30]
-        trainclass2 = class2Data[:30]
-        testclass1 = class1Data[30:50]
-        testclass2 = class2Data[30:50]
-
-        train = trainclass1.append(trainclass2)
-        test = testclass1.append(testclass2)
-        train = train[[str(feat1), str(feat2), "species"]]
-        test = test[[str(feat1), str(feat2), "species"]]
-        train.sample(frac=1)
-
-        y = train['species']
-        ytest = test['species']
-        train = train.drop('species', axis=1)
-        test = test.drop('species', axis=1)
-        y = y.to_numpy().reshape((-1, 1))
-        ytest = ytest.to_numpy().reshape((-1, 1))
-
-        return y, ytest, train, test
-
-    def SharedPreProcessing(self):
+    def Shared_preprocessing_train(self):
         np.random.seed(10)
-        self.data = self.data.fillna(self.data['gender'].value_counts().index[0])
-        self.data["gender"] = np.where(self.data["gender"] == "male", 1, 0)
+        X = np.array(self.train_data.drop('label', axis=1).T)
+        X = X.astype('float32') / 255
 
-        self.data.iloc[:, 1:] = (self.data.iloc[:, 1:] - self.data.iloc[:, 1:].mean()) / self.data.iloc[:, 1:].std()
-        return self.data
+        Y = np.array(self.train_data['label'])
+        Y = Y.reshape((-1, 1))
+        return X, Y
+
+    def Shared_preprocessing_test(self):
+        np.random.seed(10)
+        X = np.array(self.test_data.drop('label', axis=1).T)
+        X = X.astype('float32') / 255
+
+        Y = np.array(self.test_data['label'])
+        Y = Y.reshape((-1, 1))
+        return X, Y
