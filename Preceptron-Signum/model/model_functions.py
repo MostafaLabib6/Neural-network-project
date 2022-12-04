@@ -18,7 +18,7 @@ def signum(x):
     return -1
 
 
-def initializePramaters(dim):
+def initialize_parameters(dim):
     """
     create w with shape (dim,1) and b scaler value
 
@@ -29,7 +29,7 @@ def initializePramaters(dim):
     return w, b
 
 
-def forwardPord(W, b, X):
+def forward_propagation(W, b, X):
     """
         compute linear activation function
     :param W : initialized  wighted vector
@@ -41,10 +41,11 @@ def forwardPord(W, b, X):
     """
     Z = W.T @ X + b
     A = signum(Z)
+
     return A
 
 
-def computeCost(actual, predicted):
+def compute_cost(actual, predicted):
     """
 
     :param actual:  actual value
@@ -52,12 +53,13 @@ def computeCost(actual, predicted):
     :return:
             -->cost value
     """
+
     cost = actual - predicted
 
     return cost
 
 
-def backwordProb(X, cost, withBias=False):
+def backward_propagation(X, cost, withBias=False):
     """
 
     :param cost: Actual -Predicted
@@ -68,7 +70,7 @@ def backwordProb(X, cost, withBias=False):
     """
     dw = X * cost
     db = 0
-    if withBias == True:
+    if withBias is True:
         db = cost
 
     grads = {"dw": dw,
@@ -96,17 +98,18 @@ def optimize(w, b, X, Y, numIter, learning_rate, print_cost=False, withBias=Fals
         for index, x in X.reset_index(drop=True).iterrows():
             x = x.to_numpy().reshape((-1, 1))
 
-            A = forwardPord(w, b, x)
-            cost = computeCost(Y[index], A)
-            grads = backwordProb(x, cost, withBias)
+            A = forward_propagation(w, b, x)
+            cost = compute_cost(Y[index], A)
+            grads = backward_propagation(x, cost, withBias)
 
             dw = grads["dw"]
             db = grads["db"]
             # btw if withBias boolean value equals false the returned value for db equal false
+
             w = w + (learning_rate * dw)
             b = b + (learning_rate * db)
 
-            if i % 100 == 0 and print_cost == True:
+            if i % 100 == 0 and print_cost is True:
                 costs.append(cost)
                 print("Cost after iteration %i: %f" % (i, cost))
     return w, b, costs
@@ -126,10 +129,10 @@ def model(X_train, Y_train, X_test, Y_test, num_iterations=2000,
             --> weighted vector
             --> scaler value
     """
-    w, b = initializePramaters(X_train.shape[1])
+    w, b = initialize_parameters(X_train.shape[1])
     w, b, costs = optimize(w, b, X_train, Y_train, num_iterations, learning_rate, print_cost, withBias)
-    YpredTrain, _ = predict(X_train, w, b, Y_train)
-    YpredTest, _ = predict(X_test, w, b, Y_test)
+    YpredTrain, _ = predict(X_train, w, b, Y_train)  # train
+    YpredTest, _ = predict(X_test, w, b, Y_test)  # test
     print("Train accuracy :", YpredTrain)
     print("Test accuracy :", YpredTest)
 

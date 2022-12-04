@@ -216,23 +216,19 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
     X = pd.DataFrame(X)
     for i in range(0, epochs):
         # Forward propagation: [LINEAR --> SIGMOID].
-        print('Epoch : ', i)
         for index, x in X.T.reset_index(drop=True).iterrows():
             x = x.to_numpy().reshape((-1, 1))
 
             AL, caches = forward_propagation(x, parameters, activation)
 
-            # cost = compute_cost(AL, Y)
-
-            # Backward propagation.
             y = np.zeros((10, 1))
             y[Y[index]] = 1
+
+            # Backward propagation.
             grads = backward_propagation(AL, y, caches, activation)
             # Update parameters.
             parameters = update_parameters(parameters, grads, learning_rate, bias)
 
-        # if print_cost and i % 100 == 0:
-        #     print("Cost after iteration %i: %f" % (i, cost))
     print('training time', time.time() - start)
     return parameters
 
@@ -259,8 +255,10 @@ def get_confusion_matrix(predicted, actual):
                 if max_index == i:
                     if actual[index] == max_index:
                         confusion_matrix[i][i] = confusion_matrix[i][i] + 1
+                        break
                     else:
                         confusion_matrix[i][actual[index]] = confusion_matrix[i][actual[index]] + 1
+                        break
 
     return confusion_matrix
 
