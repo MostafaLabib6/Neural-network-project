@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import time
 from model.helper_functions import sigmoid, tanh, sigmoid_backward, tanh_backward
-
+from tqdm import tqdm
 np.random.seed(10)
 
 
@@ -160,7 +160,7 @@ def backward_propagation(AL, Y, caches, activation="Sigmoid"):
     grads["dW" + str(L)], grads["db" + str(L)], grads["dA" + str(L - 1)] = transform_activation_backward(dAL,
                                                                                                          current_cache,
                                                                                                          activation)
-
+    
     for layer_index in reversed(range(L - 1)):
         current_cache = caches[layer_index]
 
@@ -214,7 +214,8 @@ def model(X, Y, dims, learning_rate=0.001, bias=True, activation='sigmoid', epoc
     start = time.time()
     parameters = initialize_parameters(dims)
     X = pd.DataFrame(X)
-    for i in range(0, epochs):
+    print("epochs...")
+    for i in tqdm(range(0, epochs)):
         # Forward propagation: [LINEAR --> SIGMOID].
         for index, x in X.T.reset_index(drop=True).iterrows():
             x = x.to_numpy().reshape((-1, 1))
