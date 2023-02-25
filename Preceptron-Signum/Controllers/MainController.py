@@ -3,6 +3,13 @@ import model.model_functions as helper
 import matplotlib.pyplot as plt
 import seaborn as sns
 import Services.DataPreProcessingService as dpp
+"""
+150 --50 per class  --30train  20test  --90train  -60test
+
+
+
+"""
+
 
 
 class MainController:
